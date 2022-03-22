@@ -15,7 +15,7 @@ class App {
     this.block = new Block(200, 300, 400, 30);
     this.ball = new Ball(this.stageWidth, this.stageHeight, 50, 5, this.block);
 
-    this.animate();
+    window.requestAnimationFrame(this.animate.bind(this));
   }
 
   resize() {
