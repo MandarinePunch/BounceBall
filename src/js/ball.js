@@ -1,6 +1,7 @@
 export class Ball {
   constructor(stageWidth, stageHeight, radius, speed, block) {
     this.radius = radius;
+    this.speed = speed;
     this.vx = speed;
     this.vy = speed;
 
@@ -14,9 +15,14 @@ export class Ball {
       this.checkY < block.maxY + this.radius;
     this.x = this.checkXYWithBlock ? this.radius : this.checkX;
     this.y = this.checkXYWithBlock ? this.radius : this.checkY;
+
+    this.onMouseDown = this.mousedown.bind(this);
+    this.onMouseUp = this.mouseup.bind(this);
+    this.onMouseMove = this.mousemove.bind(this);
   }
 
   draw(ctx, stageWidth, stageHeight, block) {
+    window.addEventListener("mousedown", this.onMouseDown);
     this.x += this.vx;
     this.y += this.vy;
 
@@ -67,5 +73,48 @@ export class Ball {
         this.y += this.vy;
       }
     }
+  }
+
+  setDirection() {
+    this.vxDirection = this.vx < 0 ? -1 : 1;
+    this.vyDirection = this.vy < 0 ? -1 : 1;
+  }
+
+  mousedown(event) {
+    window.removeEventListener("mouseup", this.onMouseUp);
+    this.offsetX = event.clientX - this.x;
+    this.offsetY = event.clientY - this.y;
+
+    this.setDirection();
+    if (
+      Math.abs(this.offsetX) <= this.radius &&
+      Math.abs(this.offsetY) <= this.radius
+    ) {
+      window.addEventListener("mousemove", this.onMouseMove);
+    }
+  }
+
+  mousemove(event) {
+    this.x = event.clientX - this.offsetX;
+    this.y = event.clientY - this.offsetY;
+
+    this.vx = 0;
+    this.vy = 0;
+    window.addEventListener("mouseup", this.onMouseUp);
+  }
+
+  mouseup() {
+    this.vx = this.speed;
+    this.vy = this.speed;
+
+    if (this.vxDirection < 0) {
+      this.vx *= -1;
+    }
+    if (this.vyDirection < 0) {
+      this.vy *= -1;
+    }
+
+    window.removeEventListener("mousemove", this.onMouseMove);
+    window.removeEventListener("mousedown", this.onMouseDown);
   }
 }
